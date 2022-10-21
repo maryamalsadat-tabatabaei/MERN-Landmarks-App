@@ -1,0 +1,31 @@
+{
+  "name": "back-end",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maryamsadat-tabatabaei/e-commerce-app.git"
+  },
+  "author": "Maryam Tabatabaei",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.0",
+    "body-parser": "^1.19.0",
+    "dotenv": "^16.0.3",
+    "express": "^4.17.1",
+    "express-validator": "^6.2.0",
+    "uuid": "^3.3.3"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.4"
+  },
+  "bugs": {
+    "url": "https://github.com/maryamsadat-tabatabaei/e-commerce-app/issues"
+  },
+  "homepage": "https://github.com/maryamsadat-tabatabaei/e-commerce-app#readme"
+}
