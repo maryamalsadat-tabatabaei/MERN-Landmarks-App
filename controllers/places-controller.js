@@ -158,6 +158,12 @@ exports.updatePlaceById = async (req, res, next) => {
   // DUMMY_PLACES[updatedPlaceId] = updatedPlace;
   // res.status(200).json({ place: updatedPlace });
 
+  //Authorization
+  if (place.creator.toString() !== req.userData.userId) {
+    const error = new HttpError("You are not allowed to edit this place.", 401);
+    return next(error);
+  }
+
   place.title = title;
   place.description = description;
   try {
@@ -195,6 +201,16 @@ exports.deletePlaceById = async (req, res, next) => {
   // }
   // DUMMY_PLACES = DUMMY_PLACES.filter((p) => p.id !== placeId);
   // res.status(200).json({ message: "Deleted place." });
+
+  //Authorization
+  if (place.creator.id !== req.userData.userId) {
+    const error = new HttpError(
+      "You are not allowed to delete this place.",
+      401
+    );
+    return next(error);
+  }
+
   try {
     const sess = await mongoose.startSession();
     sess.startTransaction();
