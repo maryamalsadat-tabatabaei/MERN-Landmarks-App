@@ -59,7 +59,7 @@ exports.signup = async (req, res, next) => {
   const newUser = new User({
     name,
     email,
-    image: "https://live.staticflickr.com/7631/26849088292_36fc52ee90_b.jpg",
+    image: req.file.path, //"http://localhost:5000/" + req.file.path,
     password,
     places: [],
   });

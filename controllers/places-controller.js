@@ -1,4 +1,5 @@
 const uuid = require("uuid/v4");
+const fs = require("fs");
 const { validationResult } = require("express-validator");
 const HttpError = require("../models/http-error");
 const getCoordsForAddress = require("../util/location");
@@ -90,8 +91,7 @@ exports.createPlace = async (req, res, next) => {
     description,
     address,
     location: coordinates,
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Empire_State_Building_%28aerial_view%29.jpg/400px-Empire_State_Building_%28aerial_view%29.jpg",
+    image: req.file.path,
     creator,
   });
 
@@ -208,6 +208,12 @@ exports.deletePlaceById = async (req, res, next) => {
       500
     );
     return next(error);
+  }
+
+  if (req.file) {
+    fs.unlink(req.file.path, (err) => {
+      console.log(err);
+    });
   }
   res.status(200).json({ message: "Deleted place." });
 };
