@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt.js");
 const jwt = require("jsonwebtoken");
 const HttpError = require("../models/http-error");
 const User = require("../models/user");
+require("dotenv").config;
 
 // const DUMMY_USERS = [
 //   {
@@ -86,7 +87,7 @@ exports.signup = async (req, res, next) => {
   try {
     token = jwt.sign(
       { userId: createdUser.id, email: createdUser.email },
-      "super_super_secret",
+      process.env.JWT_SALT,
       {
         expiresIn: "1h",
       }
@@ -157,7 +158,7 @@ exports.login = async (req, res, next) => {
   try {
     token = jwt.sign(
       { userId: existingUser.id, email: existingUser.email },
-      "super_super_secret",
+      process.env.JWT_SALT,
       {
         expiresIn: "1h",
       }
