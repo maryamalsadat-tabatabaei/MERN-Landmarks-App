@@ -7,24 +7,9 @@ const Place = require("../models/place");
 const User = require("../models/user");
 const { default: mongoose } = require("mongoose");
 
-// let DUMMY_PLACES = [
-//   {
-//     id: "p1",
-//     title: "Empire State Building",
-//     description: "One of the most famous sky scrapers in the world!",
-//     location: {
-//       lat: 40.7484474,
-//       lng: -73.9871516,
-//     },
-//     address: "20 W 34th St, New York, NY 10001",
-//     creator: "u1",
-//   },
-// ];
-
 exports.getPlacesByUserId = async (req, res, next) => {
   const userId = req.params.uid;
 
-  // const userPlaces = DUMMY_PLACES.filter((u) => u.creator === userId);
   let userWithPlaces;
   try {
     userWithPlaces = await User.findById(userId).populate("places");
@@ -37,11 +22,13 @@ exports.getPlacesByUserId = async (req, res, next) => {
   }
 
   if (!userWithPlaces || userWithPlaces.places.length === 0) {
-    throw new HttpError(
+    const error = new HttpError(
       "Could not find a place for the provided user id.",
       404
     );
+    return next(error);
   }
+
   res.status(200).json({
     places: userWithPlaces.places.map((place) => {
       return place.toObject({ getters: true });
@@ -52,7 +39,6 @@ exports.getPlacesByUserId = async (req, res, next) => {
 exports.getPlaceById = async (req, res, next) => {
   const placeId = req.params.pid;
 
-  // const place = DUMMY_PLACES.find((p) => p.id === placeId);
   let place;
   try {
     place = await Place.findById(placeId);
@@ -77,39 +63,30 @@ exports.getPlaceById = async (req, res, next) => {
 exports.createPlace = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    new HttpError("Invalid inputs passed, please check your data.", 422);
+    return next(
+      new HttpError("Invalid inputs passed, please check your data.", 422)
+    );
   }
-  const { title, description, address, creator } = req.body;
+  const { title, description, address } = req.body;
   let coordinates;
   try {
     coordinates = await getCoordsForAddress(address);
   } catch (error) {
     return next(error);
   }
-  // const createdPlace = new Place({
-  //   title,
-  //   description,
-  //   address,
-  //   location: coordinates,
-  //   image: req.file.path,
-  //   creator: req.userData.userId,
-  // });
+
   const createdPlace = new Place({
     title,
     description,
     address,
     location: coordinates,
     image: req.file.path, //"http://localhost:8000/" + req.file.path,
-    creator,
+    creator: req.userData.userId,
   });
-
-  // DUMMY_PLACES.push(createdPlace); //unshift(createdPlace)
-  // res.status(201).json({ createdPlace });
 
   let user;
   try {
-    // user = await User.findById(req.userData.userId);
-    user = await User.findById(creator);
+    user = await User.findById(req.userData.userId);
   } catch (err) {
     const error = new HttpError("Creating place failed, please try again", 500);
     return next(error);
@@ -119,7 +96,7 @@ exports.createPlace = async (req, res, next) => {
     const error = new HttpError("Could not find user for provided id", 404);
     return next(error);
   }
-  console.log(user);
+
   try {
     const sess = await mongoose.startSession();
     sess.startTransaction();
@@ -139,13 +116,17 @@ exports.createPlace = async (req, res, next) => {
 
 exports.updatePlaceById = async (req, res, next) => {
   const errors = validationResult(req);
+
   if (!errors.isEmpty()) {
-    new HttpError("Invalid inputs passed, please check your data.", 422);
+    const error = new HttpError(
+      "Invalid inputs passed, please check your data.",
+      422
+    );
+    return next(error);
   }
   const { title, description } = req.body;
   const placeId = req.params.pid;
 
-  // const updatedPlaceId = DUMMY_PLACES.find((p) => p.id === placeId);
   let place;
   try {
     place = await Place.findById(placeId);
@@ -158,14 +139,12 @@ exports.updatePlaceById = async (req, res, next) => {
   }
 
   if (!place) {
-    throw new HttpError("Could not find a place for the provided id.", 404);
+    const error = new HttpError(
+      "Could not find a place for the provided id.",
+      404
+    );
+    return next(error);
   }
-
-  // const updatedPlace = { ...DUMMY_PLACES.find((p) => p.id === placeId) };
-  // updatedPlace.title = title;
-  // updatedPlace.description = description;
-  // DUMMY_PLACES[updatedPlaceId] = updatedPlace;
-  // res.status(200).json({ place: updatedPlace });
 
   //Authorization
   if (place.creator.toString() !== req.userData.userId) {
@@ -175,6 +154,7 @@ exports.updatePlaceById = async (req, res, next) => {
 
   place.title = title;
   place.description = description;
+
   try {
     await place.save();
   } catch (err) {
@@ -192,7 +172,7 @@ exports.deletePlaceById = async (req, res, next) => {
 
   let place;
   try {
-    place = Place.findById(placeId).populate("creator");
+    place = await Place.findById(placeId).populate("creator");
   } catch (err) {
     const error = new HttpError(
       "Something went wrong, could not delete place.",
@@ -205,11 +185,6 @@ exports.deletePlaceById = async (req, res, next) => {
     const error = new HttpError("Could not find place for this id.", 404);
     return next(error);
   }
-  // if (!DUMMY_PLACES.find((p) => p.id === placeId)) {
-  //   throw new HttpError("Could not find a place for that id.", 404);
-  // }
-  // DUMMY_PLACES = DUMMY_PLACES.filter((p) => p.id !== placeId);
-  // res.status(200).json({ message: "Deleted place." });
 
   //Authorization
   if (place.creator.id !== req.userData.userId) {
@@ -219,6 +194,8 @@ exports.deletePlaceById = async (req, res, next) => {
     );
     return next(error);
   }
+
+  const imagePath = place.image;
 
   try {
     const sess = await mongoose.startSession();
@@ -235,10 +212,9 @@ exports.deletePlaceById = async (req, res, next) => {
     return next(error);
   }
 
-  if (req.file) {
-    fs.unlink(req.file.path, (err) => {
-      console.log(err);
-    });
-  }
+  fs.unlink(imagePath, (err) => {
+    console.log(err);
+  });
+
   res.status(200).json({ message: "Deleted place." });
 };

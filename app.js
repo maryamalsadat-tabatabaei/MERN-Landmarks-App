@@ -29,6 +29,7 @@ app.use("/api/users", usersRoutes);
 app.use((req, res, next) => {
   throw new HttpError("Sorry, Could not find this route.", 404);
 });
+
 app.use((error, req, res, next) => {
   //rollback image upload
   if (req.file) {
@@ -36,12 +37,11 @@ app.use((error, req, res, next) => {
       console.log(err);
     });
   }
-  if (res.headerSent) {
+  if (res.headersSent) {
     return next(error);
   }
-  res
-    .status(error.code || 500)
-    .json({ message: error.message || "An unknown error occurred!" });
+  res.status(error.code || 500);
+  res.json({ message: error.message || "An unknown error occurred!" });
 });
 
 const MONGODB_URI = `mongodb+srv://${process.env.MONGO_DB_USER}:${process.env.MONGO_DB_PASSWORD}@node-project.6mr8s0d.mongodb.net/${process.env.MONGO_DB_COLLECTION}`;
