@@ -5,18 +5,7 @@ const HttpError = require("../models/http-error");
 const User = require("../models/user");
 require("dotenv").config;
 
-// const DUMMY_USERS = [
-//   {
-//     id: "u1",
-//     name: "Maryam Tabatabaei",
-//     email: "test@test.com",
-//     password: "testers",
-//   },
-// ];
-
 exports.getUsers = async (req, res, next) => {
-  // res.json({ users: DUMMY_USERS });
-
   let users;
   try {
     users = await User.find({}, "-password");
@@ -35,10 +24,6 @@ exports.signup = async (req, res, next) => {
   }
   const { name, email, password } = req.body;
 
-  // const hasUser = DUMMY_USERS.find((user) => user.email === email);
-  // if (hasUser) {
-  //   throw new HttpError("This user has already been signup.", 422);
-  // }
   let existingUser;
   try {
     existingUser = await User.findOne({ email });
@@ -69,13 +54,11 @@ exports.signup = async (req, res, next) => {
   const createdUser = new User({
     name,
     email,
-    image: req.file.path, //"http://localhost:5000/" + req.file.path,
+    image: req.file.path, //"http://localhost:8000/" + req.file.path,
     password: hashedPassword,
     places: [],
   });
 
-  // DUMMY_USERS.push(newUser);
-  // res.status(201).json({ user: newUser });
   try {
     await createdUser.save();
   } catch (err) {
@@ -102,23 +85,14 @@ exports.signup = async (req, res, next) => {
 
   res.status(201).json({
     // user: createdUser.toObject({ getters: true })
-    userId: existingUser.id,
-    email: existingUser.email,
+    userId: createdUser.id,
+    email: createdUser.email,
     token: token,
   });
 };
 
 exports.login = async (req, res, next) => {
   const { email, password } = req.body;
-
-  // const identifiedUser = DUMMY_USERS.find((user) => user.email === email);
-  // if (!identifiedUser || password !== identifiedUser.password) {
-  //   throw new HttpError(
-  //     "Could not identify user, credentials seem to be wrong.",
-  //     401
-  //   );
-  // }
-  // res.status(200).json({ message: "Logged in!" });
 
   let existingUser;
   try {
@@ -131,7 +105,7 @@ exports.login = async (req, res, next) => {
   if (!existingUser) {
     const error = new HttpError(
       "Could not identify user, credentials seem to be wrong.",
-      401
+      403
     );
     return next(error);
   }
@@ -172,7 +146,6 @@ exports.login = async (req, res, next) => {
   }
 
   res.json({
-    // message: "Logged in!",
     // user: existingUser.toObject({ getters: true }),
     userId: existingUser.id,
     email: existingUser.email,

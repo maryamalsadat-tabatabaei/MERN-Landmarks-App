@@ -79,20 +79,28 @@ exports.createPlace = async (req, res, next) => {
   if (!errors.isEmpty()) {
     new HttpError("Invalid inputs passed, please check your data.", 422);
   }
-  const { title, description, address } = req.body;
+  const { title, description, address, creator } = req.body;
   let coordinates;
   try {
     coordinates = await getCoordsForAddress(address);
   } catch (error) {
     return next(error);
   }
+  // const createdPlace = new Place({
+  //   title,
+  //   description,
+  //   address,
+  //   location: coordinates,
+  //   image: req.file.path,
+  //   creator: req.userData.userId,
+  // });
   const createdPlace = new Place({
     title,
     description,
     address,
     location: coordinates,
-    image: req.file.path,
-    creator: req.userData.userId,
+    image: req.file.path, //"http://localhost:8000/" + req.file.path,
+    creator,
   });
 
   // DUMMY_PLACES.push(createdPlace); //unshift(createdPlace)
@@ -100,7 +108,8 @@ exports.createPlace = async (req, res, next) => {
 
   let user;
   try {
-    user = await User.findById(req.userData.userId);
+    // user = await User.findById(req.userData.userId);
+    user = await User.findById(creator);
   } catch (err) {
     const error = new HttpError("Creating place failed, please try again", 500);
     return next(error);
@@ -214,7 +223,7 @@ exports.deletePlaceById = async (req, res, next) => {
   try {
     const sess = await mongoose.startSession();
     sess.startTransaction();
-    await place.remove({ session: sess });
+    await place.deleteOne({ session: sess });
     place.creator.places.pull(place);
     await place.creator.save({ session: sess });
     await sess.commitTransaction();
