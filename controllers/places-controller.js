@@ -1,4 +1,3 @@
-const uuid = require("uuid/v4");
 const fs = require("fs");
 const { validationResult } = require("express-validator");
 const HttpError = require("../models/http-error");
@@ -9,10 +8,24 @@ const { default: mongoose } = require("mongoose");
 
 exports.getPlacesByUserId = async (req, res, next) => {
   const userId = req.params.uid;
-
+  let page = +req.query.page >= 1 ? +req.query.page : 1;
   let userWithPlaces;
+  let totalPlaces;
+  let ITEMS_PER_PAGE = 2;
+
   try {
-    userWithPlaces = await User.findById(userId).populate("places");
+    totalPlaces = await Place.find({ creator: userId }).countDocuments();
+    userWithPlaces = await User.findById(userId).populate([
+      {
+        path: "places",
+        model: "Place",
+        options: {
+          sort: { title: "asc" },
+          skip: (page - 1) * ITEMS_PER_PAGE,
+          limit: ITEMS_PER_PAGE,
+        },
+      },
+    ]);
   } catch (err) {
     const error = new HttpError(
       "Fetching places failed, please try again later",
@@ -21,7 +34,12 @@ exports.getPlacesByUserId = async (req, res, next) => {
     return next(error);
   }
 
-  if (!userWithPlaces || userWithPlaces.places.length === 0) {
+  if (
+    !totalPlaces ||
+    totalPlaces === 0 ||
+    !userWithPlaces ||
+    userWithPlaces.places.length === 0
+  ) {
     const error = new HttpError(
       "Could not find a place for the provided user id.",
       404
@@ -33,6 +51,13 @@ exports.getPlacesByUserId = async (req, res, next) => {
     places: userWithPlaces.places.map((place) => {
       return place.toObject({ getters: true });
     }),
+    totalPlaces,
+    currentPage: page,
+    hasNextPage: page * ITEMS_PER_PAGE < totalPlaces,
+    hasPreviousPgae: page > 1,
+    nextPage: page + 1,
+    previousPage: page - 1,
+    lastPage: Math.ceil(totalPlaces / ITEMS_PER_PAGE),
   });
 };
 
