@@ -15,17 +15,19 @@ exports.getPlacesByUserId = async (req, res, next) => {
 
   try {
     totalPlaces = await Place.find({ creator: userId }).countDocuments();
-    userWithPlaces = await User.findById(userId).populate([
-      {
-        path: "places",
-        model: "Place",
-        options: {
-          sort: { title: "asc" },
-          skip: (page - 1) * ITEMS_PER_PAGE,
-          limit: ITEMS_PER_PAGE,
+    userWithPlaces = await User.findById(userId)
+      .populate([
+        {
+          path: "places",
+          model: "Place",
+          options: {
+            sort: { title: "asc" },
+            skip: (page - 1) * ITEMS_PER_PAGE,
+            limit: ITEMS_PER_PAGE,
+          },
         },
-      },
-    ]);
+      ])
+      .cache({ key: userId });
   } catch (err) {
     const error = new HttpError(
       "Fetching places failed, please try again later",

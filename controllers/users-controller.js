@@ -305,3 +305,9 @@ exports.postNewPassword = async (req, res, next) => {
     message: "Password Successfuly changed",
   });
 };
+
+exports.logout = async (req, res, next) => {
+  req.logout(); //clear the req.session.passport and req.user
+  res.redirect("/login");
+  console.log(`-------> User Logged out`);
+};

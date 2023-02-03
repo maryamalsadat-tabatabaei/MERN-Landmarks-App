@@ -3,6 +3,7 @@ const { check } = require("express-validator");
 const placesController = require("../controllers/places-controller");
 const checkAuth = require("../middleware/check-auth");
 const fileUpload = require("../middleware/file-upload");
+const cleanCache = require("../middleware/clean-cache");
 const router = express.Router();
 
 router.get("/user/:uid", placesController.getPlacesByUserId);
@@ -13,6 +14,7 @@ router.use(checkAuth); // from this point all the routes get authenticated
 
 router.post(
   "/",
+  cleanCache,
   fileUpload.single("image"),
   [
     check("title").not().isEmpty(),
