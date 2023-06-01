@@ -81,7 +81,11 @@ exports.signup = async (req, res, next) => {
   let token;
   try {
     token = jwt.sign(
-      { userId: createdUser.id, email: createdUser.email },
+      {
+        userId: createdUser.id,
+        email: createdUser.email,
+        iat: new Date().getTime(),
+      },
       process.env.JWT_SALT,
       {
         expiresIn: "1h",
@@ -94,7 +98,6 @@ exports.signup = async (req, res, next) => {
     );
     return next(error);
   }
-
   res.status(201).json({
     // user: createdUser.toObject({ getters: true })
     userId: createdUser.id,
@@ -143,7 +146,11 @@ exports.login = async (req, res, next) => {
   let token;
   try {
     token = jwt.sign(
-      { userId: existingUser.id, email: existingUser.email },
+      {
+        userId: existingUser.id,
+        email: existingUser.email,
+        iat: new Date().getTime(),
+      },
       process.env.JWT_SALT,
       {
         expiresIn: "1h",
@@ -214,7 +221,7 @@ exports.resetPassword = async (req, res, next) => {
     subject: "Password reset",
     html: `
             <p>You requested a password reset</p>
-            <p>Click this <a href="http://localhost:3000/user/resetPassword/${token}">link</a> to set a new password.</p>
+            <p>Click this <a href="http://localhost:3000/user/resetPassword/${resetToken}">link</a> to set a new password.</p>
           `,
   });
 

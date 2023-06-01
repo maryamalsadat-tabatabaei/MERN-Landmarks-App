@@ -1,0 +1,25 @@
+language: node_js
+node_js:
+  - "8"
+dist: trusty
+# base image for the virtual machine of os that is trusty for linux
+services:
+  - mongodb
+  - redis-server
+# services
+# env:
+#   - NOSE_ENV=ci
+cache:
+  directories:
+    - node_modules
+    -client/node_modules
+# cache node modules for later use for speed
+install: 
+  - npm install
+  - npm run build
+# command that executed
+script:
+  - nohup npm run start &
+  - sleep 3
+  - npm run test
+# 

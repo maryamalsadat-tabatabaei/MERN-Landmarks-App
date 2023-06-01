@@ -5,14 +5,10 @@ require("dotenv").config;
 const fs = require("fs");
 const cors = require("cors");
 const path = require("path");
-const cookieSession = require("cookie-session");
 const passport = require("passport");
 
-const placesRoutes = require("./routes/places-routes");
-const usersRoutes = require("./routes/users-routes");
-const googleAuthRoutes = require("./routes/google-auth-routes");
+const routes = require("./routes");
 const HttpError = require("./models/http-error");
-require("./services/passport");
 
 const app = express();
 
@@ -25,6 +21,13 @@ app.use(
 );
 app.use(bodyParser.json());
 app.use("/uploads/images", express.static(path.join("uploads", "images")));
+if (["production", "ci"].includes(process.env.NODE_ENV)) {
+  app.use(express.static("client/build"));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve("client", "build", "index.html"));
+  });
+}
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -36,23 +39,16 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(
-  cookieSession({
-    name: "google-auth-session",
-    maxAge: 24 * 60 * 60 * 1000,
-    keys: [process.env.SESSION_COOKIE_KEY],
-  })
-);
 app.use(passport.initialize());
-app.use(passport.session());
 
-app.use("/auth/google", googleAuthRoutes);
-app.use("/api/places", placesRoutes);
-app.use("/api/users", usersRoutes);
+require("./services/jwtStartegy");
+require("./services/googleStartegy");
+require("./services/localStrategy");
 
-app.use((req, res, next) => {
-  throw new HttpError("Sorry, Could not find this route.", 404);
-});
+app.use("", routes);
+// app.use((req, res, next) => {
+//   throw new HttpError("Sorry, Could not find this route.", 404);
+// });
 
 app.use((error, req, res, next) => {
   //rollback image upload

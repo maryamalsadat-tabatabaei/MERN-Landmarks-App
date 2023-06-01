@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "jest": "",
+  "jest": {
+    "setupTestFrameworkScriptFile": "./test/setup.js"
+  },
   "scripts": {
     "test": "jest",
     "start": "nodemon app.js"
@@ -36,6 +38,9 @@
     "passport": "^0.5.3",
     "passport-google-oauth2": "^0.2.0",
     "passport-google-oauth20": "^2.0.0",
+    "passport-jwt": "^4.0.1",
+    "passport-local": "^1.0.0",
+    "passport-oauth2-jwt-bearer": "^0.2.0",
     "redis": "^4.6.4",
     "uuid": "^3.3.3"
   },
