@@ -1,5 +1,5 @@
 
-# mern-e-commerce-app
+# mern-landmarks-app
 
 This is a MERN app using Express.js, React, MongoDB, and Node.js.<br>
 Based on Maximilian Schwarzmüller's tutorial on Udemy React, NodeJS, Express & MongoDB - The MERN Fullstack Guide.
@@ -24,8 +24,8 @@ Based on Maximilian Schwarzmüller's tutorial on Udemy React, NodeJS, Express & 
 
 ## Installation
 
-1. Clone the repository: `git clone https://github.com/maryamalsadat-tabatabaei/mern-e-commerce-app.git`
-2. Navigate to the project directory: `cd mern-e-commerce-app`
+1. Clone the repository: `git clone https://github.com/maryamalsadat-tabatabaei/mern-landmarks-app.git`
+2. Navigate to the project directory: `cd mern-landmarks-app`
 3. Install dependencies: `npm install`
 
 ## Usage
