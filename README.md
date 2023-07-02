@@ -2,7 +2,7 @@
 # mern-landmarks-app
 
 This is a MERN app using Express.js, React, MongoDB, and Node.js.<br>
-Based on Maximilian Schwarzmüller's tutorial on Udemy React, NodeJS, Express & MongoDB - The MERN Fullstack Guide.
+Based on tutorial on Udemy React, NodeJS, Express & MongoDB - The MERN Fullstack Guide.
 
 <img src="https://github.com/maryamalsadat-tabatabaei/mern-e-commerce-app/assets/87692864/6b4b01c0-2bf8-4b06-8fd1-b416a00ae168" alt="Signup Page" width="300" height="200">
 <img src="https://github.com/maryamalsadat-tabatabaei/mern-e-commerce-app/assets/87692864/156decb6-8f3a-47e7-a760-0a29195acb72" alt="Login Page with error message - Users can also Reset their password and Login with GoogleOauth" width="300" height="200">
