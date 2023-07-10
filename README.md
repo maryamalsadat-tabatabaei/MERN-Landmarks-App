@@ -1,5 +1,5 @@
 
-# Mern Landmarks App
+# MERN Landmarks App
 
 This is a MERN (MongoDB, Express.js, React, and Node.js) application that provides a platform for users to create and manage places. It includes user authentication, CRUD (Create, Read, Update, Delete) operations for places, and integration with external APIs.<br>
 
