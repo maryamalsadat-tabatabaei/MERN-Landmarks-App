@@ -18,8 +18,9 @@ This is a MERN (MongoDB, Express.js, React, and Node.js) application that provid
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [API Documentation](#api-documentation)
+- [Features](#features)
 - [Project Background](#project-background)
-- [New Features](#new-features)
+
 
 ## Installation
 
@@ -101,7 +102,7 @@ For external API integrations, this application uses axios to interact with the 
 
 This project is based on Maximilian Schwarzmüller's tutorial on Udemy React, NodeJS, Express & MongoDB - The MERN Fullstack Guide. I have made modifications and added new features to extend the functionality of the original project and I built upon that foundation to extend the project's functionality and address specific requirements. However, the core concept and initial implementation were inspired by the course and the work of the original author.
 
-## New Features
+**New Features**
 
 1. **Cache Functionality**: Implemented the ability to cache places by userId using Redis. This caching mechanism improves performance by reducing the need for repetitive database queries.
 
